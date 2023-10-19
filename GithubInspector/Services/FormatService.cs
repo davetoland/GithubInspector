@@ -8,9 +8,9 @@ public class OutputFormatter
 
     public List<string> FormatCommits(List<Commit> commits)
     {
-        var sample = commits.Select((x, i) => FormatCommit(x.Details, i, commits.Count)).ToList();
-        sample.Insert(0, $"Showing last {commits.Count} commits, most recent first:");
-        return sample;
+        var formatted = commits.Select((x, i) => FormatCommit(x.Details, i, commits.Count)).ToList();
+        formatted.Insert(0, $"Showing last {commits.Count} commits, most recent first:");
+        return formatted;
 
         static string FormatCommit(Details commit, int index, int count)
         {

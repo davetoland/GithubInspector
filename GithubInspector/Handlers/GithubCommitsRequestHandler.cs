@@ -15,11 +15,6 @@ public class GithubCommitsRequestHandler : IRequestHandler<GetCommitsQuery, Resu
         _githubService = githubService;
     }
 
-    // public Task<Result<List<GithubContributor>>> Handle(GetContributorsQuery query, CancellationToken cancel)
-    // {
-    //     return _githubService.GetContributors(query.Request, cancel);
-    // }
-
     public Task<Result<List<Commit>>> Handle(GetCommitsQuery query, CancellationToken cancel)
     {
         return _githubService.GetCommits(query.Request, cancel);
