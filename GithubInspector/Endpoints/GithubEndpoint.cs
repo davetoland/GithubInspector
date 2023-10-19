@@ -8,10 +8,11 @@ public static class GithubEndpoint
 {
     public static void MapGithubEndpoint(this WebApplication app)
     {
-        app.MapGet("/api/v1/{owner}/{repo}/contributors", GetContributors);
+        app.MapGet("/api/v1/{owner}/{repo}/contributors", GetCommits);
     }
 
-    public static async Task<IResult> GetContributors([AsParameters] GithubRequest request, 
+    private static async Task<IResult> GetCommits(
+        [AsParameters] GithubRequest request, 
         IMediator mediator,
         CancellationToken cancel)
     {
@@ -19,15 +20,15 @@ public static class GithubEndpoint
         if (!validation.IsValid)
             return Results.BadRequest(validation.Errors.Select(x => x.ErrorMessage));
 
-        var result = await mediator.Send(new GetCommitsQuery(request), cancel);
-        if (result.IsFailed)
-            return Results.NotFound(result.Reasons.Single().Message);
+        var response = await mediator.Send(new GetCommitsQuery(request), cancel);
+        if (response.IsFailed)
+            return Results.NotFound(response.Reasons.Single().Message);
 
-        var contributors = result.Value;
-        if (!contributors.Any())
+        var commits = response.Value;
+        if (!commits.Any())
             return Results.NoContent();
 
-        var formatted = await mediator.Send(new FormatCommitsQuery(contributors), cancel);
+        var formatted = await mediator.Send(new FormatCommitsQuery(commits), cancel);
 
         return Results.Ok(formatted);
     }        

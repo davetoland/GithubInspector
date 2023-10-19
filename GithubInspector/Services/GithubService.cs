@@ -17,7 +17,7 @@ public class GithubService
     {
         _baseUri = new("https://api.github.com/");
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _httpClient.DefaultRequestHeaders.Add(UserAgent, "davetoland");
+        _httpClient.DefaultRequestHeaders.Add(UserAgent, "GithubInspector");
     }
 
     public async Task<Result<List<Commit>>> GetCommits(GithubRequest request, CancellationToken cancel)
@@ -37,15 +37,14 @@ public class GithubService
 
     private static async Task<Result<List<T>>> ProcessResponse<T>(HttpResponseMessage response, CancellationToken cancel)
     {
-        using var contentStream = await response.Content.ReadAsStreamAsync(cancel);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancel);
 
         var payload = await JsonSerializer
             .DeserializeAsync<List<T>>(contentStream, cancellationToken: cancel)
             .ConfigureAwait(false);
         
-        if (payload is null)
-            return Result.Fail("Unable to parse the response from Github");
-
-        return payload.ToResult();
+        return payload is not null 
+            ? payload.ToResult()
+            : Result.Fail("Unable to parse the response from Github");
     }
 }

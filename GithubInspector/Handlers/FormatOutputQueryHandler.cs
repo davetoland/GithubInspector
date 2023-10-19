@@ -15,6 +15,6 @@ public class FormatOutputQueryHandler : IRequestHandler<FormatCommitsQuery, List
 
     public Task<List<string>> Handle(FormatCommitsQuery query, CancellationToken cancellationToken)
     {
-        return Task.FromResult(_formatter.FormatCommits(query.Commits));
+        return Task.FromResult(OutputFormatter.FormatCommits(query.Commits));
     }
 }

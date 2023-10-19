@@ -6,7 +6,7 @@ namespace GithubInspector.Queries;
 
 public class ValidateRequestQuery : IRequest<ValidationResult>
 {
-    public GithubRequest Request { get; init; }
+    public GithubRequest Request { get; }
 
     public ValidateRequestQuery(GithubRequest request)
     {

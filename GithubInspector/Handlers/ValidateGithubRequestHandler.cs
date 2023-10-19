@@ -14,8 +14,8 @@ public class ValidateGithubRequestHandler : IRequestHandler<ValidateRequestQuery
         _validator = validator;
     }
 
-    public async Task<ValidationResult> Handle(ValidateRequestQuery query, CancellationToken cancellationToken)
+    public Task<ValidationResult> Handle(ValidateRequestQuery query, CancellationToken cancellationToken)
     {
-        return await _validator.ValidateAsync(query.Request, cancellationToken);
+        return _validator.ValidateAsync(query.Request, cancellationToken);
     }
 }

@@ -14,7 +14,7 @@ public class GithubRequestValidator : AbstractValidator<GithubRequest>
 
 public static class AbstractValidatorExtensions
 {
-    public static void IsValidString<GithubRequest>(this IRuleBuilderInitial<GithubRequest, string> builder)
+    public static void IsValidString(this IRuleBuilderInitial<GithubRequest, string> builder)
         => builder
         .NotNull()
         .NotEmpty()
