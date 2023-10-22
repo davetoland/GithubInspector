@@ -138,6 +138,12 @@ Just ensure that the docker-compose project is selected as the Startup Project, 
 
 Visual studio will manage Docker on your behalf.
 
+### Docker Compose debugging with Jetbrains Rider
+
+Create a new debug profile, select the docker-compose template and point it at the included docker-compose.yml file.
+
+Rider will manage Docker on your behalf.
+
 ### Docker Compose debugging with VS Code
 
 Open a terminal at the root directory and run:
@@ -152,5 +158,8 @@ On the first run, this will:
 4. create a Docker network
 5. start the containers
 
+After that, use the included .vscode/launch.json to start the debugger
+
+### In all cases
 If a browser doesn't open automatically, head to:
 https://localhost:50000/swagger/
