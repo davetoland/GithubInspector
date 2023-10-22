@@ -64,6 +64,12 @@ An important point to remember in this is that the because we're reading the str
   }
 ```
 
+### FluentResult return types
+I'm not a fan of exceptions on the whole (of course, with exception) and I think they are unnecesarily overused where other more suitable options exist. If we're simply returning a failure/error result, most of the time we don't actually need to break the control flow (and the call stack) to do so. In my opinion it makes debugging more difficult, and it makes logs harder to follow. 
+I've been experimenting with libraries that return a _result_ that encapsulates this _value-or-fail_ approach, and here I'm using FluentAssertions for that, which allows me to return data wrapped in a "success" (it has a nice ToResult extension method to accomplish this from any type) and a Result.Fail method which can wrap errors or a failure message.
+I'm also not really a fan of using nullables and null as a return type either.
+By not throwing exceptions we're improving the performance of the application as well, and I think returning typed Result instances improves the debugging experience for developers following the flow, especially when things don't follow the happy path.
+
 ### Record struct models
 By using record structs for models we're getting an immutable value type (albeit containing reference types, but still less allocation), that's nice and concise and easy to generate (i.e. write the code).
 There's no point using classes for these models, and no point having Properties with setters to hold the data. It is, after all, immutable.
@@ -114,4 +120,10 @@ The initial request could go to the cache, and if it doesn't have a correspondin
 For an example of Redis caching that I did on a project recently, see the following repo.
 It uses a slightly different mechanism whereby a DelegatingHandler is injected into the Http pipeline, and that intercepts calls to the HttpClient, and checks/updates a cache but it's a similar concept:
 https://github.com/davetoland/F1Api
+
+
+# UPDATE!!
+
+I found a bit of time on Sunday afternoon to sit down and have another look at this. Over the weekend I read about MediatR's pipeline behaviour system, which is essentially the same as a middleware or http pipeline, and in light of what I wrote above I decided I'd implement a Redis cache (albeit with a _fixed_ 1 hour expiration, rather than _sliding_). I've added an `IPipelineBehavior` class to intercept the call to the GithubService, this firtly checks the cache, using the owner and repo as a key in redis. If it finds a entry, that gets returned. If not, the next() delegate is executed and a successul result from that is then added to the cache for next time before being returned back along the pipeline.
+
 
