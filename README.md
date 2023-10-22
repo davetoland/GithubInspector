@@ -105,7 +105,7 @@ public static List<string> FormatCommits(IEnumerable<Commit> commits)
 There was some ambiguity in the requirements, first asking for the last 100 commits, then in the AC stating 30. I wondered if this was a bit of a curve ball, as by default Github returns a default page size of 30, and an extra Url parameter is required to force this to 100.
 I've added that, but the MaxResults in the GithubService.cs class will allow for it to be set to 30, or whatever you wish (I haven't taken into account the actual maximum page size Github allows, so test your luck!).
 
-# Foot notes
+# Notes
 Often these things are a bit of a bore, or worse, but this was fun. I enjoyed putting this together, and I feel like it's very much my bread and butter at the moment. 
 Most of the recent work has been API related, microservices, pub/sub messaging, command and event type stuff. Using a mixture of Azure Service Bus, RabbitMQ, microservices, clean/onion architecure, etc.
 I've not used MediatR before as I say, but it's nice, and feels very similar to what I've used elsewhere.
@@ -121,9 +121,36 @@ For an example of Redis caching that I did on a project recently, see the follow
 It uses a slightly different mechanism whereby a DelegatingHandler is injected into the Http pipeline, and that intercepts calls to the HttpClient, and checks/updates a cache but it's a similar concept:
 https://github.com/davetoland/F1Api
 
-
 # UPDATE!!
 
-I found a bit of time on Sunday afternoon to sit down and have another look at this. Over the weekend I read about MediatR's pipeline behaviour system, which is essentially the same as a middleware or http pipeline, and in light of what I wrote above I decided I'd implement a Redis cache (albeit with a _fixed_ 1 hour expiration, rather than _sliding_). I've added an `IPipelineBehavior` class to intercept the call to the GithubService, this firtly checks the cache, using the owner and repo as a key in redis. If it finds a entry, that gets returned. If not, the next() delegate is executed and a successul result from that is then added to the cache for next time before being returned back along the pipeline.
+I found a bit of time on Sunday afternoon to sit down and have another look at this. Over the weekend I read about MediatR's pipeline behaviour system, which is essentially the same as a middleware or http pipeline, and in light of what I wrote above I decided I'd implement a Redis cache (albeit with a _fixed_ 1 hour expiration, rather than _sliding_). I've added an `IPipelineBehavior` class to intercept the call to the GithubService, this firstly checks the cache, deriving a Redis key from the owner and repo. If it finds an entry, that gets returned. If not, the `next()` delegate is executed which does the actual Github call; a successful result from that is then added to the cache for next time before being returned back along the pipeline.
 
+## Redis, Docker and Docker Compose
 
+I've introduced a Dockerfile and a docker-compose.yml file, it makes it easy to spin up a Redis instance quickly without any faff.
+You'll need Docker running on your system, I'm hoping this isn't an issue... if it is, just grab the 2nd to last commit, and run the code from there. I can always demo it.. 
+
+### Docker Compose debugging with Visual Studio
+
+The included Docker Compose project (docker-compose.dcproj) handles the integration with Visual Studio's debugger.
+
+Just ensure that the docker-compose project is selected as the Startup Project, and hit F5 to run.
+
+Visual studio will manage Docker on your behalf.
+
+### Docker Compose debugging with VS Code
+
+Open a terminal at the root directory and run:
+
+docker-compose up -d --build
+
+On the first run, this will:
+
+1. pull down the Redis image from Docker's repo
+2. build the application image using the Dockerfile
+3. create Docker containers for both Redis and the application
+4. create a Docker network
+5. start the containers
+
+If a browser doesn't open automatically, head to:
+https://localhost:50000/swagger/
