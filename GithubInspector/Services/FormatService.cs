@@ -4,7 +4,7 @@ namespace GithubInspector.Services;
 
 public class OutputFormatter
 {
-    public static List<string> FormatCommits(IEnumerable<Commit> commits)
+    public List<string> FormatCommits(IEnumerable<Commit> commits)
         => commits.Select(x => 
             $"[{x.Details.Author.Date:yyyy-MM-dd}] " +
             $"{x.Details.Author.Name} | " + // ({x.Details.Author.Email}): " +
